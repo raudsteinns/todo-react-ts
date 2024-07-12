@@ -1,4 +1,4 @@
-import { useState, ChangeEvent } from 'react'
+import React, { useState, ChangeEvent } from 'react'
 import './Todo.css'
 import { v4 as uuidv4 } from 'uuid';
 
@@ -30,42 +30,43 @@ const Todo: React.FC = () => {
   };
 
   // 削除button 一覧から削除する
-  const onClickDelete = (i: number): void => { // incompleteTodosの配列番号を引数に指定
-    const newTodos = [...incompleteTodos]; // Stateなどを参照する場合は関数内で新たな関数を複製
-    newTodos.splice(i, 1); //i番目の要素から1つだけ削除
+  const onClickDelete = (id: string): void => { // onClickAddのuuidv4で設定された一意のid
+    const newTodos = incompleteTodos.filter((todo) => todo.id !== id);
     setIncompleteTodos(newTodos);
   };
 
   // 完了button 一覧から削除してcompleteTodosに追加する
-  const onClickComplete = (i: number): void => {
-    const newIncompleteTodos = [...incompleteTodos];
-    newIncompleteTodos.splice(i, 1);
-    setIncompleteTodos(newIncompleteTodos); // ここまで削除ボタンと同じ処理
+  const onClickComplete = (id: string): void => {
+    const newIncompleteTodos = incompleteTodos.filter((todo) => todo.id !== id);
+    setIncompleteTodos(newIncompleteTodos);
 
-    const newCompleteTodos = [...completeTodos, incompleteTodos[i]];
-    setCompleteTodos(newCompleteTodos);
+    const completedTodo = incompleteTodos.find((todo) => todo.id === id);
+    if (completedTodo) {
+      setCompleteTodos([...completeTodos, completedTodo]);
+    }
   };
 
   // 戻すbutton 一覧から削除してincompleteTodosに追加する
-  const onClickReturn = (i: number): void => {
-    const newCompleteTodos = [...completeTodos];
-    newCompleteTodos.splice(i, 1);
+  const onClickReturn = (id: string): void => {
+    const newCompleteTodos = completeTodos.filter((todo) => todo.id !== id);
     setCompleteTodos(newCompleteTodos);
 
-    const newIncompleteTodos = [...incompleteTodos, completeTodos[i]];
-    setIncompleteTodos(newIncompleteTodos);
+    const returnedTodo = completeTodos.find((todo) => todo.id === id);
+    if (returnedTodo) {
+      setIncompleteTodos([...incompleteTodos, returnedTodo]);
+    }
   };
 
   // 編集button
   const handleEditTodo = (id: string) => {
-    setIncompleteTodos(incompleteTodos.map(todo =>
+    setIncompleteTodos(incompleteTodos.map((todo) =>
       todo.id === id ? { ...todo, isEditing: true } : todo
     ));
   };
 
   // 保存button
   const handleSaveTodo = (id: string, newText: string) => {
-    setIncompleteTodos(incompleteTodos.map(todo =>
+    setIncompleteTodos(incompleteTodos.map((todo) =>
       todo.id === id ? { ...todo, text: newText, isEditing: false } : todo
     ));
   };
@@ -73,7 +74,7 @@ const Todo: React.FC = () => {
   // 新Todoタイトル入力input
   const handleChangeTodoText = (e: ChangeEvent<HTMLInputElement>, id: string) => {
     const newText = e.target.value;
-    setIncompleteTodos(incompleteTodos.map(todo =>
+    setIncompleteTodos(incompleteTodos.map((todo) =>
       todo.id === id ? { ...todo, text: newText } : todo
     ));
   };

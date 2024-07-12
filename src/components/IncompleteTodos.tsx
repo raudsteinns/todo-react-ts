@@ -17,8 +17,8 @@ interface Todo {
 interface Props {
   limit: boolean;
   todos: Todo[];
-  onClickComplete: (i: number) => void;
-  onClickDelete: (i: number) => void;
+  onClickComplete: (id: string) => void;
+  onClickDelete: (id: string) => void;
   onEditTodo: (id: string) => void;
   onSaveTodo: (id: string, newText: string) => void;
   onChangeTodoText: (e: ChangeEvent<HTMLInputElement>, id: string) => void;
@@ -34,7 +34,7 @@ const IncompleteTodos: React.FC<Props> = (props) => {
           <p className='msg-caution'>登録できるTODOは最大5個です。</p>
         )}
         <ul>
-          {todos.map((todo, i) => (
+          {todos.map((todo) => (
             <li key={todo.id} className='todo-item--list'>
               <div className="todo-item--list-row">
                 <div className="todo-item--header">
@@ -55,9 +55,9 @@ const IncompleteTodos: React.FC<Props> = (props) => {
                   ) : (
                     <button onClick={() => onEditTodo(todo.id)}>編集</button>
                   )}
-                  <button onClick={() => onClickComplete(i)}>完了</button>{' '}
+                  <button onClick={() => onClickComplete(todo.id)}>完了</button>{' '}
                   {/* 関数として定義しないとレンダリングの度に実行される */}
-                  <button onClick={() => onClickDelete(i)}>削除</button>{' '}
+                  <button onClick={() => onClickDelete(todo.id)}>削除</button>{' '}
                   {/* 関数として定義しないとレンダリングの度に実行される */}
                 </div>
               </div>
