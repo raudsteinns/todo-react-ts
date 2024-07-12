@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {ChangeEvent} from 'react';
 
 const style = {
   backgroundColor: 'var(--white-c)',
@@ -11,6 +11,7 @@ const style = {
 interface Todo {
   id: string;
   text: string;
+  isEditing: boolean;
 }
 
 interface Props {
@@ -18,10 +19,13 @@ interface Props {
   todos: Todo[];
   onClickComplete: (i: number) => void;
   onClickDelete: (i: number) => void;
+  onEditTodo: (id: string) => void;
+  onSaveTodo: (id: string, newText: string) => void;
+  onChangeTodoText: (e: ChangeEvent<HTMLInputElement>, id: string) => void;
 }
 
 const IncompleteTodos: React.FC<Props> = (props) => {
-  const { limit, todos, onClickComplete, onClickDelete } = props;
+  const { limit, todos, onClickComplete, onClickDelete, onEditTodo, onSaveTodo, onChangeTodoText } = props;
   return (
     <>
       <div style={style} className='c-box'>
@@ -35,9 +39,22 @@ const IncompleteTodos: React.FC<Props> = (props) => {
               <div className="todo-item--list-row">
                 <div className="todo-item--header">
                   <span className='todo-item__id'>{todo.id}</span>
-                  <div className="todo-item__ttl">{todo.text}</div>
+                  {todo.isEditing ? (
+                    <input
+                      type="text"
+                      value={todo.text}
+                      onChange={(e) => onChangeTodoText(e, todo.id)}
+                    />
+                  ) : (
+                    <div className="todo-item__ttl">{todo.text}</div>
+                  )}
                 </div>
                 <div className='todo-item--btns'>
+                  {todo.isEditing ? (
+                    <button onClick={() => onSaveTodo(todo.id, todo.text)}>保存</button>
+                  ) : (
+                    <button onClick={() => onEditTodo(todo.id)}>編集</button>
+                  )}
                   <button onClick={() => onClickComplete(i)}>完了</button>{' '}
                   {/* 関数として定義しないとレンダリングの度に実行される */}
                   <button onClick={() => onClickDelete(i)}>削除</button>{' '}

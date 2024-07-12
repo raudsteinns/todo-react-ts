@@ -87,34 +87,34 @@
   --_grid-columns: 12;
   --_grid-rows: 7;
   --_grid-gap: var(--_global--gap);
-  --__pg-base: calc((100% - var(--_grid-gap) * (var(--_grid-columns) - 1)) / var(--_grid-columns));
+  --_pg-base: calc((100% - var(--_grid-gap) * (var(--_grid-columns) - 1)) / var(--_grid-columns));
   --_pg0: 0%;
-  --_pg1: calc(var(--__pg-base) * 1 + var(--_grid-gap) * 0);
-  --_pg2: calc(var(--__pg-base) * 2 + var(--_grid-gap) * 1);
-  --_pg3: calc(var(--__pg-base) * 3 + var(--_grid-gap) * 2);
-  --_pg4: calc(var(--__pg-base) * 4 + var(--_grid-gap) * 3);
-  --_pg5: calc(var(--__pg-base) * 5 + var(--_grid-gap) * 4);
-  --_pg6: calc(var(--__pg-base) * 6 + var(--_grid-gap) * 5);
-  --_pg7: calc(var(--__pg-base) * 7 + var(--_grid-gap) * 6);
-  --_pg8: calc(var(--__pg-base) * 8 + var(--_grid-gap) * 7);
-  --_pg9: calc(var(--__pg-base) * 9 + var(--_grid-gap) * 8);
-  --_pg10: calc(var(--__pg-base) * 10 + var(--_grid-gap) * 9);
-  --_pg11: calc(var(--__pg-base) * 11 + var(--_grid-gap) * 10);
-  --_pg12: calc(var(--__pg-base) * 12 + var(--_grid-gap) * 11);
-  --__cg-base: calc((var(--_container-max-width) - var(--_grid-gap) * (var(--_grid-columns) - 1)) / var(--_grid-columns));
+  --_pg1: calc(var(--_pg-base) * 1 + var(--_grid-gap) * 0);
+  --_pg2: calc(var(--_pg-base) * 2 + var(--_grid-gap) * 1);
+  --_pg3: calc(var(--_pg-base) * 3 + var(--_grid-gap) * 2);
+  --_pg4: calc(var(--_pg-base) * 4 + var(--_grid-gap) * 3);
+  --_pg5: calc(var(--_pg-base) * 5 + var(--_grid-gap) * 4);
+  --_pg6: calc(var(--_pg-base) * 6 + var(--_grid-gap) * 5);
+  --_pg7: calc(var(--_pg-base) * 7 + var(--_grid-gap) * 6);
+  --_pg8: calc(var(--_pg-base) * 8 + var(--_grid-gap) * 7);
+  --_pg9: calc(var(--_pg-base) * 9 + var(--_grid-gap) * 8);
+  --_pg10: calc(var(--_pg-base) * 10 + var(--_grid-gap) * 9);
+  --_pg11: calc(var(--_pg-base) * 11 + var(--_grid-gap) * 10);
+  --_pg12: calc(var(--_pg-base) * 12 + var(--_grid-gap) * 11);
+  --_cg-base: calc((var(--_container-max-width) - var(--_grid-gap) * (var(--_grid-columns) - 1)) / var(--_grid-columns));
   --_cg0: 0%;
-  --_cg1: calc(var(--__cg-base) * 1 + var(--_grid-gap) * 0);
-  --_cg2: calc(var(--__cg-base) * 2 + var(--_grid-gap) * 1);
-  --_cg3: calc(var(--__cg-base) * 3 + var(--_grid-gap) * 2);
-  --_cg4: calc(var(--__cg-base) * 4 + var(--_grid-gap) * 3);
-  --_cg5: calc(var(--__cg-base) * 5 + var(--_grid-gap) * 4);
-  --_cg6: calc(var(--__cg-base) * 6 + var(--_grid-gap) * 5);
-  --_cg7: calc(var(--__cg-base) * 7 + var(--_grid-gap) * 6);
-  --_cg8: calc(var(--__cg-base) * 8 + var(--_grid-gap) * 7);
-  --_cg9: calc(var(--__cg-base) * 9 + var(--_grid-gap) * 8);
-  --_cg10: calc(var(--__cg-base) * 10 + var(--_grid-gap) * 9);
-  --_cg11: calc(var(--__cg-base) * 11 + var(--_grid-gap) * 10);
-  --_cg12: calc(var(--__cg-base) * 12 + var(--_grid-gap) * 11);
+  --_cg1: calc(var(--_cg-base) * 1 + var(--_grid-gap) * 0);
+  --_cg2: calc(var(--_cg-base) * 2 + var(--_grid-gap) * 1);
+  --_cg3: calc(var(--_cg-base) * 3 + var(--_grid-gap) * 2);
+  --_cg4: calc(var(--_cg-base) * 4 + var(--_grid-gap) * 3);
+  --_cg5: calc(var(--_cg-base) * 5 + var(--_grid-gap) * 4);
+  --_cg6: calc(var(--_cg-base) * 6 + var(--_grid-gap) * 5);
+  --_cg7: calc(var(--_cg-base) * 7 + var(--_grid-gap) * 6);
+  --_cg8: calc(var(--_cg-base) * 8 + var(--_grid-gap) * 7);
+  --_cg9: calc(var(--_cg-base) * 9 + var(--_grid-gap) * 8);
+  --_cg10: calc(var(--_cg-base) * 10 + var(--_grid-gap) * 9);
+  --_cg11: calc(var(--_cg-base) * 11 + var(--_grid-gap) * 10);
+  --_cg12: calc(var(--_cg-base) * 12 + var(--_grid-gap) * 11);
   
   --_gutters: max(min(6vw,var(--_rem2)),env(safe-area-inset-right),env(safe-area-inset-left));
 }
@@ -351,7 +351,12 @@ ul>li::before {
   padding: var(--_p-2);
 }
 .todo-item--list-row>.todo-item--header {
-  flex: 1 1 200px;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--_global--gap)*.125);
+  max-width: calc(100% - (var(--_global--gap)*.5) - 55px);
   margin: 0;
   word-break: break-all;
 }
@@ -360,6 +365,9 @@ ul>li::before {
   padding: calc(var(--_p-2)*.5);
   border-radius: var(--radius-s);
   display: inline-block;
+}
+.todo-item--list-row>.todo-item--header>input {
+  width: 100%;
 }
 .todo-item--list-row>.todo-item--btns {
   flex: 0 0 auto;
