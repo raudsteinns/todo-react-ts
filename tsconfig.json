@@ -1,0 +1,19 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.node.json"
+    },
+    {
+      "compilerOptions": {
+        "tsx": "react-tsx",
+        "esModuleInterop": true
+      },
+      "include": ["src/**/*.tsx"],
+      "exclude": ["node_modules", "build"]
+    }
+  ],
+}
