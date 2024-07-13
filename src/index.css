@@ -2,9 +2,9 @@
   --pri-c: #654a4e;
   --pri-c--hov: #916a70;
   --sec-c: #e6dcdd;
+  --ter-c: #efe9e9;
 
   --white-c: #f8f5f5;
-  --white-c--hov: #e6dcdd;;
   
   --caution-c: #ff1f54;
   --caution-c-bg: #ffebf0;
@@ -371,12 +371,12 @@ summary::-webkit-details-marker {
   transition: .4s var(--easing-b);
 }
 .todo-item--list:hover {
-  background-color: var(--white-c--hov);
+  background-color: var(--sec-c);
   transition: .2s var(--easing-b);
 }
 
 .todo-item--list-details {
-  background-color: #EFE9E9;
+  background-color: var(--ter-c);
   border-radius: 0 var(--radius-s) var(--radius-s) 0;
   overflow: hidden;
 }
@@ -395,7 +395,7 @@ summary::-webkit-details-marker {
   transform: scaleY(-1);
 }
 .todo-item--list-details[open] {
-  background-color: var(--white-c--hov);
+  background-color: var(--sec-c);
 }
 .todo-item--list-details[open]::after {
   transform: scaleY(1);
@@ -457,7 +457,8 @@ summary::-webkit-details-marker {
 
 .todo-item--list-content__inner {
   font-size: .75rem;
-  background-color: #EFE9E9;
+  background-color: var(--ter-c);
+  border-right: var(--_p-2) solid var(--sec-c);
   padding: var(--_p-2) var(--_p-1);
   display: flex;
   flex-direction: column;
