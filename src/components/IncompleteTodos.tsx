@@ -1,4 +1,6 @@
 import React, { useState, ChangeEvent, useMemo } from "react";
+import useTodoActions from "../hooks/useTodoActions";
+import TodoFunctions from "./TodoFunctions";
 
 const style = {
   backgroundColor: "var(--white-c)",
@@ -23,44 +25,34 @@ interface Todo {
 interface Props {
   limit: boolean;
   todos: Todo[];
+  setIncompleteTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
   onClickComplete: (id: string) => void;
   onClickDelete: (id: string) => void;
-  onEditTodo: (id: string) => void;
-  onSaveTodo: (id: string, newText: string, newPriority: number) => void;
-  onChangeTodoText: (e: ChangeEvent<HTMLInputElement>, id: string) => void;
-  onChangeTodoPriority: (e: ChangeEvent<HTMLSelectElement>, id: string) => void;
-  onAddMemo: (id: string, memo: string) => void;
-  onDeleteMemo: (id: string) => void;
-  onToggleAddMemo: (id: string) => void;
-  onCancelEdit: (id: string) => void;
 }
 
 const IncompleteTodos: React.FC<Props> = ({
   limit,
   todos,
+  setIncompleteTodos,
   onClickComplete,
   onClickDelete,
-  onEditTodo,
-  onSaveTodo,
-  onAddMemo,
-  onDeleteMemo,
-  onToggleAddMemo,
-  onCancelEdit,
 }) => {
-  const [memoText, setMemoText] = useState<{ [key: string]: string }>({});
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [filterPriority, setFilterPriority] = useState<string>("");
-  const [editValues, setEditValues] = useState<{
-    [key: string]: { text: string; priority: number };
-  }>({});
 
-  const handleToggleAddMemo = (id: string, existingMemo?: string) => {
-    setMemoText((prev) => ({
-      ...prev,
-      [id]: existingMemo || "",
-    }));
-    onToggleAddMemo(id);
-  };
+  const {
+    memoText,
+    setMemoText,
+    editValues,
+    handleToggleAddMemo,
+    handleEditTodo,
+    handleChangeTodoText,
+    handleChangeTodoPriority,
+    handleSaveTodo,
+    handleCancelEdit,
+    handleAddMemo,
+    handleDeleteMemo,
+  } = useTodoActions(todos, setIncompleteTodos);
 
   const handleSortChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setSortOrder(e.target.value as "asc" | "desc");
@@ -83,58 +75,6 @@ const IncompleteTodos: React.FC<Props> = ({
     );
   }, [filteredTodos, sortOrder]);
 
-  const handleEditTodo = (id: string) => {
-    const todo = todos.find((todo) => todo.id === id);
-    if (todo) {
-      setEditValues((prev) => ({
-        ...prev,
-        [id]: { text: todo.text, priority: todo.priority },
-      }));
-    }
-    onEditTodo(id);
-  };
-
-  const handleChangeTodoText = (
-    e: ChangeEvent<HTMLInputElement>,
-    id: string
-  ) => {
-    const newText = e.target.value;
-    setEditValues((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], text: newText },
-    }));
-  };
-
-  const handleChangeTodoPriority = (
-    e: ChangeEvent<HTMLSelectElement>,
-    id: string
-  ) => {
-    const newPriority = parseInt(e.target.value);
-    setEditValues((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], priority: newPriority },
-    }));
-  };
-
-  const handleSaveTodo = (id: string) => {
-    const { text, priority } = editValues[id];
-    onSaveTodo(id, text, priority);
-    setEditValues((prev) => {
-      const newEditValues = { ...prev };
-      delete newEditValues[id];
-      return newEditValues;
-    });
-  };
-
-  const handleCancelEdit = (id: string) => {
-    onCancelEdit(id);
-    setEditValues((prev) => {
-      const newEditValues = { ...prev };
-      delete newEditValues[id];
-      return newEditValues;
-    });
-  };
-
   return (
     <>
       <div style={style} className="c-box">
@@ -142,34 +82,12 @@ const IncompleteTodos: React.FC<Props> = ({
           未完了のTODO
         </h2>
         {limit && <p className="msg-caution">登録できるTODOは最大5個です。</p>}
-        <div className="l-todo-functions">
-          <div className="sort-container">
-            <label htmlFor="sortOrder">ソート順: </label>
-            <select
-              id="sortOrder"
-              value={sortOrder}
-              onChange={handleSortChange}
-            >
-              <option value="asc">高い順</option>
-              <option value="desc">低い順</option>
-            </select>
-          </div>
-          <div className="filter-container">
-            <label htmlFor="filterPriority">フィルター: </label>
-            <select
-              id="filterPriority"
-              value={filterPriority}
-              onChange={handleFilterChange}
-            >
-              <option value="">すべて</option>
-              <option value="1">優先度 1</option>
-              <option value="2">優先度 2</option>
-              <option value="3">優先度 3</option>
-              <option value="4">優先度 4</option>
-              <option value="5">優先度 5</option>
-            </select>
-          </div>
-        </div>
+        <TodoFunctions
+          sortOrder={sortOrder}
+          filterPriority={filterPriority}
+          onSortChange={handleSortChange}
+          onFilterChange={handleFilterChange}
+        />
         <ul>
           {sortedTodos.map((todo) => (
             <li key={todo.id} className="todo-item--list">
@@ -183,7 +101,11 @@ const IncompleteTodos: React.FC<Props> = ({
                 <summary className="todo-item--list-summary js-summary">
                   <div className="todo-item--list-summary__inner">
                     <div className="todo-item--header">
-                      <div className="todo-item__priority">
+                      <div
+                        className={
+                          "c-tag todo-item__priority priority-" + todo.priority
+                        }
+                      >
                         優先度:{" "}
                         {todo.isEditing ? (
                           <select
@@ -259,7 +181,7 @@ const IncompleteTodos: React.FC<Props> = ({
                           </button>
                           <button
                             onClick={() => {
-                              onDeleteMemo(todo.id);
+                              handleDeleteMemo(todo.id);
                               setMemoText({ ...memoText, [todo.id]: "" });
                             }}
                           >
@@ -282,7 +204,7 @@ const IncompleteTodos: React.FC<Props> = ({
                             />
                             <button
                               onClick={() => {
-                                onAddMemo(todo.id, memoText[todo.id]);
+                                handleAddMemo(todo.id, memoText[todo.id]);
                                 setMemoText({ ...memoText, [todo.id]: "" });
                               }}
                             >

@@ -9,12 +9,11 @@ import CompleteTodos from "./components/CompleteTodos";
 interface Todo {
   id: string;
   text: string;
-  originalText: string; // 編集前のTodoタイトル
+  originalText: string;
   isEditing: boolean;
   createdAt: Date;
-  lastUpdatedAt: Date;
   priority: number;
-  originalPriority: number; // 編集前の優先度
+  originalPriority: number;
   memo?: string;
   isAddingMemo?: boolean;
 }
@@ -79,114 +78,6 @@ const Todo: React.FC = () => {
     }
   };
 
-  // 編集button
-  const handleEditTodo = (id: string) => {
-    setIncompleteTodos(
-      incompleteTodos.map((todo) =>
-        todo.id === id
-          ? {
-              ...todo,
-              isEditing: true,
-              originalText: todo.text, // 編集前の値を保持
-              originalPriority: todo.priority, // 編集前の値を保持
-            }
-          : todo
-      )
-    );
-  };
-
-  // 保存button
-  const handleSaveTodo = (id: string, newText: string, newPriority: number) => {
-    setIncompleteTodos(
-      incompleteTodos.map((todo) =>
-        todo.id === id
-          ? {
-              ...todo,
-              text: newText,
-              originalText: newText,
-              priority: newPriority,
-              originalPriority: newPriority,
-              isEditing: false,
-            }
-          : todo
-      )
-    );
-  };
-
-  // 新Todoタイトル入力input
-  const handleChangeTodoText = (
-    e: ChangeEvent<HTMLInputElement>,
-    id: string
-  ) => {
-    const newText = e.target.value;
-    setIncompleteTodos(
-      incompleteTodos.map((todo) =>
-        todo.id === id ? { ...todo, text: newText } : todo
-      )
-    );
-  };
-
-  // 優先度変更用の関数を追加
-  const handleChangeTodoPriority = (
-    e: ChangeEvent<HTMLSelectElement>,
-    id: string
-  ) => {
-    const newPriority = parseInt(e.target.value);
-    setIncompleteTodos(
-      incompleteTodos.map((todo) =>
-        todo.id === id ? { ...todo, priority: newPriority } : todo
-      )
-    );
-  };
-
-  const onCancelEdit = (id: string) => {
-    setIncompleteTodos(
-      incompleteTodos.map((todo) =>
-        todo.id === id
-          ? {
-              ...todo,
-              text: todo.originalText,
-              priority: todo.originalPriority,
-              isEditing: false,
-            }
-          : todo
-      )
-    );
-  };
-
-  const handleAddMemo = (id: string, memo: string) => {
-    setIncompleteTodos(
-      incompleteTodos.map((todo) =>
-        todo.id === id
-          ? { ...todo, memo, isAddingMemo: false, lastUpdatedAt: new Date() }
-          : todo
-      )
-    );
-  };
-
-  const handleDeleteMemo = (id: string) => {
-    setIncompleteTodos(
-      incompleteTodos.map((todo) =>
-        todo.id === id
-          ? {
-              ...todo,
-              memo: undefined,
-              isAddingMemo: false,
-              lastUpdatedAt: new Date(),
-            }
-          : todo
-      )
-    );
-  };
-
-  const handleToggleAddMemo = (id: string) => {
-    setIncompleteTodos(
-      incompleteTodos.map((todo) =>
-        todo.id === id ? { ...todo, isAddingMemo: !todo.isAddingMemo } : todo
-      )
-    );
-  };
-
   // 未完了のTODOの数が5個以上になったら
   const isMaxLimitIncompleteTodos = incompleteTodos.length >= 5;
 
@@ -207,23 +98,14 @@ const Todo: React.FC = () => {
         <IncompleteTodos
           limit={isMaxLimitIncompleteTodos}
           todos={incompleteTodos}
+          setIncompleteTodos={setIncompleteTodos}
           onClickComplete={onClickComplete}
           onClickDelete={onClickDelete}
-          onEditTodo={handleEditTodo}
-          onSaveTodo={handleSaveTodo}
-          onChangeTodoText={handleChangeTodoText}
-          onChangeTodoPriority={handleChangeTodoPriority}
-          onAddMemo={handleAddMemo}
-          onDeleteMemo={handleDeleteMemo}
-          onToggleAddMemo={handleToggleAddMemo}
-          onCancelEdit={onCancelEdit}
         />
         <CompleteTodos
           todos={completeTodos}
+          setCompleteTodos={setCompleteTodos}
           onClickReturn={onClickReturn}
-          onAddMemo={handleAddMemo}
-          onDeleteMemo={handleDeleteMemo}
-          onToggleAddMemo={handleToggleAddMemo}
         />
       </div>
     </>

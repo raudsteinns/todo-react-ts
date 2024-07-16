@@ -1,4 +1,6 @@
 import React, { useState, ChangeEvent } from "react";
+import useTodoActions from "../hooks/useTodoActions";
+import TodoFunctions from "./TodoFunctions";
 
 const style = {
   backgroundColor: "var(--white-c)",
@@ -11,35 +13,35 @@ const style = {
 interface Todo {
   id: string;
   text: string;
+  originalText: string;
+  isEditing: boolean;
   createdAt: Date;
   priority: number;
+  originalPriority: number;
   memo?: string;
   isAddingMemo?: boolean;
 }
-
 interface Props {
   todos: Todo[];
+  setCompleteTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
   onClickReturn: (id: string) => void;
-  onAddMemo: (id: string, memo: string) => void;
-  onDeleteMemo: (id: string) => void;
-  onToggleAddMemo: (id: string) => void;
 }
 
-const CompleteTodos: React.FC<Props> = (props) => {
-  const { todos, onClickReturn, onAddMemo, onDeleteMemo, onToggleAddMemo } =
-    props;
-
-  const [memoText, setMemoText] = useState<{ [key: string]: string }>({});
+const CompleteTodos: React.FC<Props> = ({
+  todos,
+  setCompleteTodos,
+  onClickReturn,
+}) => {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [filterPriority, setFilterPriority] = useState<string>("");
 
-  const handleToggleAddMemo = (id: string, existingMemo?: string) => {
-    setMemoText((prev) => ({
-      ...prev,
-      [id]: existingMemo || "",
-    }));
-    onToggleAddMemo(id);
-  };
+  const {
+    memoText,
+    setMemoText,
+    handleToggleAddMemo,
+    handleAddMemo,
+    handleDeleteMemo,
+  } = useTodoActions(todos, setCompleteTodos);
 
   const handleSortChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setSortOrder(e.target.value as "asc" | "desc");
@@ -64,34 +66,12 @@ const CompleteTodos: React.FC<Props> = (props) => {
         <h2 className="title has-xl-font-size" data-layout="-fluid-typography">
           完了のTODO
         </h2>
-        <div className="l-todo-functions">
-          <div className="c-sort-container">
-            <label htmlFor="sortOrder">ソート順: </label>
-            <select
-              id="sortOrder"
-              value={sortOrder}
-              onChange={handleSortChange}
-            >
-              <option value="asc">優先度高い順</option>
-              <option value="desc">優先度低い順</option>
-            </select>
-          </div>
-          <div className="c-filter-container">
-            <label htmlFor="filterPriority">フィルター: </label>
-            <select
-              id="filterPriority"
-              value={filterPriority}
-              onChange={handleFilterChange}
-            >
-              <option value="">すべて</option>
-              <option value="1">優先度 1</option>
-              <option value="2">優先度 2</option>
-              <option value="3">優先度 3</option>
-              <option value="4">優先度 4</option>
-              <option value="5">優先度 5</option>
-            </select>
-          </div>
-        </div>
+        <TodoFunctions
+          sortOrder={sortOrder}
+          filterPriority={filterPriority}
+          onSortChange={handleSortChange}
+          onFilterChange={handleFilterChange}
+        />
         <ul>
           {sortedTodos.map((todo) => (
             <li key={todo.id} className="todo-item--list">
@@ -135,7 +115,7 @@ const CompleteTodos: React.FC<Props> = (props) => {
                             </button>
                             <button
                               onClick={() => {
-                                onDeleteMemo(todo.id);
+                                handleDeleteMemo(todo.id);
                                 setMemoText({ ...memoText, [todo.id]: "" });
                               }}
                             >
@@ -160,7 +140,7 @@ const CompleteTodos: React.FC<Props> = (props) => {
                             <div className="todo-item--memo__btns">
                               <button
                                 onClick={() => {
-                                  onAddMemo(todo.id, memoText[todo.id]);
+                                  handleAddMemo(todo.id, memoText[todo.id]);
                                   setMemoText({ ...memoText, [todo.id]: "" });
                                 }}
                               >

@@ -379,6 +379,7 @@ summary::-webkit-details-marker {
   background-color: var(--ter-c);
   border-radius: 0 var(--radius-s) var(--radius-s) 0;
   overflow: hidden;
+  transition: .2s var(--easing-b);
 }
 .todo-item--list-details::after {
   content: '';
@@ -394,13 +395,14 @@ summary::-webkit-details-marker {
   text-align: center;
   transform: scaleY(-1);
 }
-.todo-item--list-details[open] {
+.todo-item--list-details[open],
+.todo-item--list-details:hover {
   background-color: var(--sec-c);
 }
 .todo-item--list-details[open]::after {
   transform: scaleY(1);
 }
-.todo-item--list-summary:not(.is-editing):hover {
+.todo-item--list-details:not(.is-editing)>.todo-item--list-summary:hover {
   cursor: pointer;
 }
 .todo-item--list-summary__inner {
