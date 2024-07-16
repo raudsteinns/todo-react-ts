@@ -9,12 +9,12 @@ import CompleteTodos from "./components/CompleteTodos";
 interface Todo {
   id: string;
   text: string;
-  originalText: string;
+  originalText: string; // 編集前のTodoタイトル
   isEditing: boolean;
   createdAt: Date;
   lastUpdatedAt: Date;
   priority: number;
-  originalPriority: number; // 追加
+  originalPriority: number; // 編集前の優先度
   memo?: string;
   isAddingMemo?: boolean;
 }

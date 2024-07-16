@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useMemo } from "react";
 
 const style = {
   backgroundColor: "var(--white-c)",
@@ -42,8 +42,6 @@ const IncompleteTodos: React.FC<Props> = ({
   onClickDelete,
   onEditTodo,
   onSaveTodo,
-  onChangeTodoText,
-  onChangeTodoPriority,
   onAddMemo,
   onDeleteMemo,
   onToggleAddMemo,
@@ -52,6 +50,9 @@ const IncompleteTodos: React.FC<Props> = ({
   const [memoText, setMemoText] = useState<{ [key: string]: string }>({});
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [filterPriority, setFilterPriority] = useState<string>("");
+  const [editValues, setEditValues] = useState<{
+    [key: string]: { text: string; priority: number };
+  }>({});
 
   const handleToggleAddMemo = (id: string, existingMemo?: string) => {
     setMemoText((prev) => ({
@@ -69,14 +70,70 @@ const IncompleteTodos: React.FC<Props> = ({
     setFilterPriority(e.target.value);
   };
 
-  const filteredTodos = todos.filter(
-    (todo) =>
-      filterPriority === "" || todo.priority === parseInt(filterPriority)
-  );
+  const filteredTodos = useMemo(() => {
+    return todos.filter(
+      (todo) =>
+        filterPriority === "" || todo.priority === parseInt(filterPriority)
+    );
+  }, [todos, filterPriority]);
 
-  const sortedTodos = filteredTodos.sort((a, b) =>
-    sortOrder === "asc" ? a.priority - b.priority : b.priority - a.priority
-  );
+  const sortedTodos = useMemo(() => {
+    return filteredTodos.sort((a, b) =>
+      sortOrder === "asc" ? a.priority - b.priority : b.priority - a.priority
+    );
+  }, [filteredTodos, sortOrder]);
+
+  const handleEditTodo = (id: string) => {
+    const todo = todos.find((todo) => todo.id === id);
+    if (todo) {
+      setEditValues((prev) => ({
+        ...prev,
+        [id]: { text: todo.text, priority: todo.priority },
+      }));
+    }
+    onEditTodo(id);
+  };
+
+  const handleChangeTodoText = (
+    e: ChangeEvent<HTMLInputElement>,
+    id: string
+  ) => {
+    const newText = e.target.value;
+    setEditValues((prev) => ({
+      ...prev,
+      [id]: { ...prev[id], text: newText },
+    }));
+  };
+
+  const handleChangeTodoPriority = (
+    e: ChangeEvent<HTMLSelectElement>,
+    id: string
+  ) => {
+    const newPriority = parseInt(e.target.value);
+    setEditValues((prev) => ({
+      ...prev,
+      [id]: { ...prev[id], priority: newPriority },
+    }));
+  };
+
+  const handleSaveTodo = (id: string) => {
+    const { text, priority } = editValues[id];
+    onSaveTodo(id, text, priority);
+    setEditValues((prev) => {
+      const newEditValues = { ...prev };
+      delete newEditValues[id];
+      return newEditValues;
+    });
+  };
+
+  const handleCancelEdit = (id: string) => {
+    onCancelEdit(id);
+    setEditValues((prev) => {
+      const newEditValues = { ...prev };
+      delete newEditValues[id];
+      return newEditValues;
+    });
+  };
 
   return (
     <>
@@ -86,18 +143,18 @@ const IncompleteTodos: React.FC<Props> = ({
         </h2>
         {limit && <p className="msg-caution">登録できるTODOは最大5個です。</p>}
         <div className="l-todo-functions">
-          <div className="c-sort-container">
+          <div className="sort-container">
             <label htmlFor="sortOrder">ソート順: </label>
             <select
               id="sortOrder"
               value={sortOrder}
               onChange={handleSortChange}
             >
-              <option value="asc">優先度高い順</option>
-              <option value="desc">優先度低い順</option>
+              <option value="asc">高い順</option>
+              <option value="desc">低い順</option>
             </select>
           </div>
-          <div className="c-filter-container">
+          <div className="filter-container">
             <label htmlFor="filterPriority">フィルター: </label>
             <select
               id="filterPriority"
@@ -117,24 +174,25 @@ const IncompleteTodos: React.FC<Props> = ({
           {sortedTodos.map((todo) => (
             <li key={todo.id} className="todo-item--list">
               <details
-                className="todo-item--list-details js-details"
-                onClick={(e) => todo.isEditing && e.preventDefault()}
+                className={`todo-item--list-details js-details ${
+                  todo.isEditing ? "is-editing" : ""
+                }`}
+                open={todo.isEditing} // 編集中は詳細を開いた状態にする
+                onClick={(e) => todo.isEditing && e.preventDefault()} // 編集中はクリックを無効にする
               >
-                <summary
-                  className={`todo-item--list-summary js-summary ${
-                    todo.isEditing ? "is-editing" : ""
-                  }`}
-                >
+                <summary className="todo-item--list-summary js-summary">
                   <div className="todo-item--list-summary__inner">
                     <div className="todo-item--header">
-                      <div
-                        className={`c-tag todo-item__priority priority-${todo.priority}`}
-                      >
+                      <div className="todo-item__priority">
                         優先度:{" "}
                         {todo.isEditing ? (
                           <select
-                            value={todo.priority}
-                            onChange={(e) => onChangeTodoPriority(e, todo.id)}
+                            value={
+                              editValues[todo.id]?.priority || todo.priority
+                            }
+                            onChange={(e) =>
+                              handleChangeTodoPriority(e, todo.id)
+                            }
                           >
                             <option value="1">1</option>
                             <option value="2">2</option>
@@ -149,8 +207,8 @@ const IncompleteTodos: React.FC<Props> = ({
                       {todo.isEditing ? (
                         <input
                           type="text"
-                          value={todo.text}
-                          onChange={(e) => onChangeTodoText(e, todo.id)}
+                          value={editValues[todo.id]?.text || todo.text}
+                          onChange={(e) => handleChangeTodoText(e, todo.id)}
                         />
                       ) : (
                         <div className="todo-item__ttl">{todo.text}</div>
@@ -159,20 +217,16 @@ const IncompleteTodos: React.FC<Props> = ({
                     <div className="todo-item--btns">
                       {todo.isEditing ? (
                         <>
-                          <button
-                            onClick={() =>
-                              onSaveTodo(todo.id, todo.text, todo.priority)
-                            }
-                          >
+                          <button onClick={() => handleSaveTodo(todo.id)}>
                             保存
                           </button>
-                          <button onClick={() => onCancelEdit(todo.id)}>
+                          <button onClick={() => handleCancelEdit(todo.id)}>
                             キャンセル
                           </button>
                         </>
                       ) : (
                         <>
-                          <button onClick={() => onEditTodo(todo.id)}>
+                          <button onClick={() => handleEditTodo(todo.id)}>
                             編集
                           </button>
                           <button onClick={() => onClickComplete(todo.id)}>
@@ -195,24 +249,22 @@ const IncompleteTodos: React.FC<Props> = ({
                     <div className="todo-item--memo">
                       {todo.memo && !todo.isAddingMemo ? (
                         <>
-                          <p>{todo.memo}</p>
-                          <div className="todo-item--memo__btns">
-                            <button
-                              onClick={() =>
-                                handleToggleAddMemo(todo.id, todo.memo)
-                              }
-                            >
-                              メモを編集
-                            </button>
-                            <button
-                              onClick={() => {
-                                onDeleteMemo(todo.id);
-                                setMemoText({ ...memoText, [todo.id]: "" });
-                              }}
-                            >
-                              メモを削除
-                            </button>
-                          </div>
+                          <p className="todo-item__memo">{todo.memo}</p>
+                          <button
+                            onClick={() =>
+                              handleToggleAddMemo(todo.id, todo.memo)
+                            }
+                          >
+                            メモを編集
+                          </button>
+                          <button
+                            onClick={() => {
+                              onDeleteMemo(todo.id);
+                              setMemoText({ ...memoText, [todo.id]: "" });
+                            }}
+                          >
+                            メモを削除
+                          </button>
                         </>
                       ) : (
                         todo.isAddingMemo && (
@@ -228,21 +280,19 @@ const IncompleteTodos: React.FC<Props> = ({
                               }
                               placeholder="メモを追加"
                             />
-                            <div className="todo-item--memo__btns">
-                              <button
-                                onClick={() => {
-                                  onAddMemo(todo.id, memoText[todo.id]);
-                                  setMemoText({ ...memoText, [todo.id]: "" });
-                                }}
-                              >
-                                保存
-                              </button>
-                              <button
-                                onClick={() => handleToggleAddMemo(todo.id)}
-                              >
-                                キャンセル
-                              </button>
-                            </div>
+                            <button
+                              onClick={() => {
+                                onAddMemo(todo.id, memoText[todo.id]);
+                                setMemoText({ ...memoText, [todo.id]: "" });
+                              }}
+                            >
+                              保存
+                            </button>
+                            <button
+                              onClick={() => handleToggleAddMemo(todo.id)}
+                            >
+                              キャンセル
+                            </button>
                           </>
                         )
                       )}
