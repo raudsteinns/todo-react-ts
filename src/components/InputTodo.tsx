@@ -1,5 +1,3 @@
-import React, { ChangeEvent } from "react";
-
 const style = {
   backgroundColor: "var(--white-c)",
   borderRadius: "var(--radius-m)",
